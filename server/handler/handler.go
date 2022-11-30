@@ -64,13 +64,31 @@ func (this *HandlerChain) writeFromIndex(ctx *Context, obj interface{}, index in
 		ctx.HandlerIndex = i
 		obj = this.Has[i].write(ctx, obj)
 	}
-	_, err := ctx.Conn.Write(obj.([]byte))
-	if err != nil {
-		fmt.Printf("write to Conn Failed! err : %v\n", err)
-		return
-	}
 }
 
 func (this *HandlerChain) AddHandler(h Handler) {
 	this.Has = append(this.Has, h)
+}
+
+// 触发下一个写出的handler
+func (this *HandlerChain) triggerNextWriteHandler(ctx *Context, handler Handler, obj interface{}) interface{} {
+	index := 0
+
+	if handler == nil {
+		index = len(this.Has) - 1
+	} else {
+		//先找到当前的
+		for i := len(this.Has) - 1; i >= 0; i-- {
+			if this.Has[i] == handler {
+				index = i - 1
+				break
+			}
+		}
+	}
+
+	if index >= 0 {
+		return this.Has[index].write(ctx, obj)
+	} else {
+		return nil
+	}
 }

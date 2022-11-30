@@ -6,10 +6,21 @@ import (
 	"fantastic_chat/server/serialize"
 	"fantastic_chat/server/utils"
 	"fmt"
+	"sync"
+	"sync/atomic"
 )
 
 var ServerVersion = 1
-var frameId = 1
+var frameIdIncrement uint32 = 1
+
+var wg sync.WaitGroup
+
+// 原子操作版加函数
+func getFrameId() int {
+	wg.Add(1)
+	defer wg.Done()
+	return int(atomic.AddUint32(&frameIdIncrement, 1))
+}
 
 type Frame struct {
 	FrameLen      int         //帧长
@@ -62,8 +73,7 @@ func GenerateFrameBytes(frameId int, frameType int, payload interface{}, encrypt
 }
 
 func GenerateMessageFrame(msg interface{}) *Frame {
-	f := GenerateFrame(frameId, message.GetMessageTypeByInterface(msg), msg, encrypt.AESEncryptType, serialize.JsonSerializeType)
-	frameId++
+	f := GenerateFrame(getFrameId(), message.GetMessageTypeByInterface(msg), msg, encrypt.AESEncryptType, serialize.JsonSerializeType)
 	return f
 }
 

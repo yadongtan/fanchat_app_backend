@@ -2,7 +2,8 @@ package message
 
 // AckMessage 回复消息
 type AckMessage struct {
-	Ack int
+	Ack int    `json:"ack"`
+	Msg string `json:"msg"`
 }
 
 // 正常响应
@@ -21,12 +22,15 @@ var AckMessageFailed *AckMessage
 func init() {
 	AckMessageOk = &AckMessage{
 		Ok,
+		"成功",
 	}
 	AckMessageInvalied = &AckMessage{
 		Invalid,
+		"非法请求",
 	}
 	AckMessageFailed = &AckMessage{
 		Failed,
+		"操作失败",
 	}
 }
 

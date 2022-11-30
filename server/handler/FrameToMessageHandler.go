@@ -6,16 +6,15 @@ import (
 	"fmt"
 )
 
-var frameId int
-
-func init() {
-	frameId = 1
-}
-
 type FrameToMessageHandler struct {
 }
 
-func (*FrameToMessageHandler) read(ctx *Context, obj interface{}) (interface{}, error) {
+func (this *FrameToMessageHandler) read(ctx *Context, obj interface{}) (interface{}, error) {
+
+	if obj == nil {
+		return nil, nil
+	}
+
 	f := obj.(*frame.Frame)
 	msg := f.Payload.(message.Message)
 
@@ -26,7 +25,7 @@ func (*FrameToMessageHandler) read(ctx *Context, obj interface{}) (interface{}, 
 		//登录成功
 		if ackMsg.(*message.AckMessage).Ack == message.Ok {
 			fmt.Printf("用户[%s] 登录成功\n", msg.(*message.SignInMessage).Username)
-			ctx.Ch.Uid = msg.(*message.SignInMessage).Uid
+			ctx.Ch.TTid = msg.(*message.SignInMessage).TTid
 			OnlineUserChannelChan <- ctx.Ch
 		} else {
 			fmt.Printf("用户[%s] 登录失败\n", msg.(*message.SignInMessage).Username)
@@ -35,12 +34,22 @@ func (*FrameToMessageHandler) read(ctx *Context, obj interface{}) (interface{}, 
 
 	fmt.Printf("AckMsg:%v\n", ackMsg)
 	ackF := frame.GenerateAckFrame(f, ackMsg)
-	ctx.Write(ackF)
+	ctx.Chain.triggerNextWriteHandler(ctx, this, ackF)
 	return f, nil
 }
 
-func (*FrameToMessageHandler) write(ctx *Context, obj interface{}) interface{} {
-	f := frame.GenerateMessageFrame(obj)
-	frameId++
-	return f
+func (this *FrameToMessageHandler) write(ctx *Context, obj interface{}) interface{} {
+	f := frame.GenerateMessageFrame(obj) //将Message包装成帧
+	//f是响应结果
+	ackF := ctx.Chain.triggerNextWriteHandler(ctx, this, f)
+
+	if ackF == nil {
+		return nil
+	}
+
+	msg := ackF.(*frame.Frame).Payload.(message.Message)
+	if ackF.(*frame.Frame).FrameType != message.AckFrameType {
+		fmt.Printf("接收到响应msg:%v \t 但该响应不是Ack类型!\n", msg)
+	}
+	return msg
 }

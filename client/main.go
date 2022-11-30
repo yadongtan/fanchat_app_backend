@@ -38,6 +38,7 @@ func readData(conn net.Conn) {
 		cnt, err := conn.Read(data)
 		if err != nil {
 			fmt.Println("客户端读取服务器数据时发生错误")
+			time.Sleep(10 * time.Second)
 			continue
 		}
 		str := string(data[0:cnt])
@@ -63,10 +64,12 @@ func writeData(conn net.Conn) {
 		}
 		bytes := frame.GenerateFrameBytesDefault(1, msg)
 
+		fmt.Println(string(bytes))
 		// _, err = conn.Write([]byte(message))
 		_, err := conn.Write(bytes)
 		if err != nil {
 			fmt.Println("网络发生错误, 请稍后重试")
+			time.Sleep(10 * time.Second)
 			continue
 		}
 		time.Sleep(10 * time.Second)

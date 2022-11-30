@@ -40,10 +40,20 @@ func (this *LengthFieldBasedFrameDecoder) read(ctx *Context, obj interface{}) (i
 		}
 		currentReadCount += cnt
 	}
+	fmt.Printf("[LengthFieldBasedFrameDecoder] received data: [ %s ]\n", string(rawData))
 	// fmt.Printf("解析到数据帧:%v\n", string(rawData))
 	return rawData, nil
 }
 
 func (this *LengthFieldBasedFrameDecoder) write(ctx *Context, obj interface{}) interface{} {
-	return obj
+	for sent := 0; sent < len(obj.([]byte)); {
+		cnt, err := ctx.Conn.Write(obj.([]byte)[sent:])
+		if err != nil {
+			fmt.Printf("Write to Conn Failed! err: %v\n", err)
+			return nil
+		}
+		sent += cnt
+	}
+	//这里应该等待消息回应
+	return nil
 }
