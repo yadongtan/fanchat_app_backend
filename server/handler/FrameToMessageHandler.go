@@ -34,12 +34,13 @@ func (this *FrameToMessageHandler) read(ctx *Context, obj interface{}) (interfac
 
 	fmt.Printf("AckMsg:%v\n", ackMsg)
 	ackF := frame.GenerateAckFrame(f, ackMsg)
+	fmt.Printf("AckFrame:%v\n", ackF)
 	ctx.Chain.triggerNextWriteHandler(ctx, this, ackF)
 	return f, nil
 }
 
 func (this *FrameToMessageHandler) write(ctx *Context, obj interface{}) interface{} {
-	f := frame.GenerateMessageFrame(obj) //将Message包装成帧
+	f := frame.GenerateMessageFrame(ctx.Ch.GenerateFrameId(), obj) //将Message包装成帧
 	//f是响应结果
 	ackF := ctx.Chain.triggerNextWriteHandler(ctx, this, f)
 

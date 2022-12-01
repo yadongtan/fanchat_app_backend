@@ -6,10 +6,11 @@ import (
 	"fmt"
 )
 
-var WaitForAckMessageChanMap map[int]chan *frame.Frame
+// frameId
+var WaitForAckMessageChanMap map[string]chan *frame.Frame
 
 func init() {
-	WaitForAckMessageChanMap = make(map[int]chan *frame.Frame)
+	WaitForAckMessageChanMap = make(map[string]chan *frame.Frame)
 }
 
 type ByteToFrameHandler struct {

@@ -3,11 +3,43 @@ package handler
 import (
 	"fmt"
 	"net"
+	"strconv"
+	"sync"
+	"sync/atomic"
 )
 
 type Channel struct {
-	Ctx  *Context //上下文
-	TTid int      //用户id
+	Ctx              *Context //上下文
+	TTid             int      //用户id
+	frameIdIncrement uint32
+	wg               *sync.WaitGroup
+}
+
+// 原子操作版加函数
+func (this *Channel) atomicIncrNum(i uint32) int {
+	this.wg.Add(1)
+	defer this.wg.Done()
+	return int(atomic.AddUint32(&i, 1))
+}
+
+func (this *Channel) GenerateFrameId() string {
+	incIdNum := this.atomicIncrNum(this.frameIdIncrement) //获取一个唯一的自增数字
+	frameId := IntToString(this.TTid, 9) + IntToString(incIdNum, 10)
+	return frameId
+}
+
+func IntToString(i int, numLength int) string {
+	//数字右边部分
+	right := strconv.Itoa(i)
+	//左边差多少位补多少个0
+	count := numLength - len(right)
+
+	left := ""
+	for j := 0; j < count; j++ {
+		left += "0"
+	}
+	return left + right
+
 }
 
 // 在线用户集合
