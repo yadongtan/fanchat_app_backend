@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fantastic_chat/server/channel"
 	"fmt"
 	"net"
 	"strconv"
@@ -60,6 +61,7 @@ func init() {
 		for {
 			c := <-OnlineUserChannelChan
 			OnlineUserChannelMap[c.TTid] = c
+			channel.Cs.OnlinePersonCount = len(OnlineUserChannelMap)
 			fmt.Printf("用户[TTid=%d]已上线\n", c.TTid)
 			fmt.Printf("当前在线用户:%v\n", OnlineUserChannelMap)
 		}

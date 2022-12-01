@@ -50,7 +50,7 @@ func startServer(ip string, port int) {
 		go ch.KeepAlive() // 持续读取并处理数据
 
 		connList.PushFront(&conn)
-		fmt.Println("当前在线用户:", connList)
+		fmt.Println("当前已连接的客户端:", connList)
 		//// 分发客户端上线消息
 		//go sendOnlineMessage(conn, connList)
 		//// 读取并处理客户端数据

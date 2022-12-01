@@ -1,6 +1,8 @@
 package message
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Message interface {
 	Invoke() Message
@@ -9,6 +11,11 @@ type Message interface {
 var AckFrameType = 100
 var SignInFrameType = 101
 var LogoutFrameType = 102
+
+var GetOnlinePersonCountMessageFrameType = 200
+var PublicChatImgMessageFrameType = 201
+var PublicChatTextMessageFrameType = 202
+var PublicChatVideoMessageType = 203
 
 func GetMessageByType(messageType int) interface{} {
 	switch messageType {
@@ -19,6 +26,18 @@ func GetMessageByType(messageType int) interface{} {
 	case AckFrameType:
 		return &AckMessage{}
 	}
+
+	switch messageType {
+	case GetOnlinePersonCountMessageFrameType:
+		return &GetOnlinePersonCountMessage{}
+	case PublicChatImgMessageFrameType:
+		return &PublicChatImgMessage{}
+	case PublicChatTextMessageFrameType:
+		return &PublicChatTextMessage{}
+	case PublicChatVideoMessageType:
+		return &PublicChatVideoMessage{}
+	}
+
 	return nil
 }
 
@@ -31,6 +50,17 @@ func GetMessageTypeByInterface(msg interface{}) int {
 		return LogoutFrameType
 	case *AckMessage:
 		return AckFrameType
+	}
+
+	switch msg.(type) {
+	case *GetOnlinePersonCountMessage:
+		return GetOnlinePersonCountMessageFrameType
+	case *PublicChatImgMessage:
+		return PublicChatImgMessageFrameType
+	case *PublicChatTextMessage:
+		return PublicChatTextMessageFrameType
+	case *PublicChatVideoMessage:
+		return PublicChatVideoMessageType
 	}
 	return 0
 }

@@ -2,8 +2,9 @@ package message
 
 // AckMessage 回复消息
 type AckMessage struct {
-	Ack int    `json:"ack"`
-	Msg string `json:"msg"`
+	Ack  int         `json:"ack"`
+	Msg  string      `json:"msg"`
+	Data interface{} `json:"data"`
 }
 
 // 正常响应
@@ -15,22 +16,27 @@ var Invalid = 400
 // 失败消息体
 var Failed = 500
 
-var AckMessageOk *AckMessage
-var AckMessageInvalied *AckMessage
-var AckMessageFailed *AckMessage
-
-func init() {
-	AckMessageOk = &AckMessage{
+func AckMessageOk(data interface{}) *AckMessage {
+	return &AckMessage{
 		Ok,
 		"成功",
+		data,
 	}
-	AckMessageInvalied = &AckMessage{
+}
+
+func AckMessageInvalid(data interface{}) *AckMessage {
+	return &AckMessage{
 		Invalid,
 		"非法请求",
+		data,
 	}
-	AckMessageFailed = &AckMessage{
+}
+
+func AckMessageFailed(data interface{}) *AckMessage {
+	return &AckMessage{
 		Failed,
 		"操作失败",
+		data,
 	}
 }
 
