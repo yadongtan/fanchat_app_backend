@@ -5,3 +5,7 @@ type PublicChatVideoMessage struct {
 	TTid     int    `json:"ttid"`
 	Username string `json:"username"`
 }
+
+func (this *PublicChatVideoMessage) Invoke() Message {
+	return AckMessageOk(nil)
+}

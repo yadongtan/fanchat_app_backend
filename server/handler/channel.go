@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fantastic_chat/server/channel"
+	"fantastic_chat/server/message"
 	"fmt"
 	"net"
 	"strconv"
@@ -13,7 +14,7 @@ type Channel struct {
 	Ctx              *Context //上下文
 	TTid             int      //用户id
 	frameIdIncrement uint32
-	wg               *sync.WaitGroup
+	wg               sync.WaitGroup
 }
 
 // 原子操作版加函数
@@ -74,6 +75,18 @@ func init() {
 			fmt.Printf("当前在线用户:%v\n", OnlineUserChannelMap)
 		}
 	}()
+	// 写出所有公有消息
+	go func() {
+		for {
+			publicTextMsg := <-message.MsgChan
+			for ttid, ch := range OnlineUserChannelMap {
+				if ttid == publicTextMsg.TTid {
+					continue
+				}
+				go ch.Write(publicTextMsg)
+			}
+		}
+	}()
 }
 
 func CreateChannel(conn net.Conn) *Channel {
@@ -85,6 +98,7 @@ func CreateChannel(conn net.Conn) *Channel {
 			nil,
 		},
 		TTid: -1,
+		wg:   sync.WaitGroup{},
 	}
 	ch.Ctx.Ch = ch
 	return ch

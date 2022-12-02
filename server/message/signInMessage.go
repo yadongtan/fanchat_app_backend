@@ -14,6 +14,10 @@ func (this *SignInMessage) Invoke() Message {
 
 	if this.TTid == 123456 && this.Password == "123456" {
 		return AckMessageOk(nil)
+	} else if this.TTid == 220993 && this.Password == "220993" {
+		return AckMessageOk(nil)
+	} else if this.TTid == 859888 && this.Password == "859888" {
+		return AckMessageOk(nil)
 	} else {
 		return AckMessageFailed(nil)
 	}
