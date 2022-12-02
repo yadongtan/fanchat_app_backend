@@ -7,5 +7,5 @@ type PublicChatVideoMessage struct {
 }
 
 func (this *PublicChatVideoMessage) Invoke() Message {
-	return AckMessageOk(nil)
+	return AckMessageOk("Ok", nil)
 }

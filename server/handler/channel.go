@@ -2,17 +2,21 @@ package handler
 
 import (
 	"fantastic_chat/server/channel"
+	"fantastic_chat/server/database"
 	"fantastic_chat/server/message"
 	"fmt"
 	"net"
 	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
+	"time"
 )
 
 type Channel struct {
-	Ctx              *Context //上下文
-	TTid             int      //用户id
+	Ctx              *Context // 上下文
+	TTid             int      // 用户id
+	Username         string   // 用户名称
 	frameIdIncrement uint32
 	wg               sync.WaitGroup
 }
@@ -65,6 +69,7 @@ func init() {
 			channel.Cs.OnlinePersonCount = len(OnlineUserChannelMap)
 			fmt.Printf("用户[TTid=%d]已上线\n", c.TTid)
 			fmt.Printf("当前在线用户:%v\n", OnlineUserChannelMap)
+
 		}
 	}()
 	// 移除在线用户
@@ -72,6 +77,23 @@ func init() {
 		for {
 			c := <-OfflineUserChannelChan
 			delete(OnlineUserChannelMap, c.TTid)
+
+			// 添加离线日志
+			ip := strings.Split(c.Ctx.Conn.RemoteAddr().String(), ":")[0]
+			ipDetails := database.GetIpDetails(ip)
+
+			signinLog := &database.UserSigninLog{
+				TTid:     c.TTid,
+				Type:     "Offline",
+				Ctime:    time.Now().Format("2002-01-01 01:01:01"),
+				Ip:       ip,
+				Province: ipDetails.Province,
+				City:     ipDetails.City,
+				Region:   ipDetails.Region,
+				Addr:     ipDetails.Addr,
+			}
+
+			database.GetDB().Create(signinLog)
 			fmt.Printf("当前在线用户:%v\n", OnlineUserChannelMap)
 		}
 	}()
@@ -83,6 +105,7 @@ func init() {
 				if ttid == publicTextMsg.TTid {
 					continue
 				}
+
 				go ch.Write(publicTextMsg)
 			}
 		}

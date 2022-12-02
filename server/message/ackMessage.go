@@ -16,26 +16,27 @@ var Invalid = 400
 // 失败消息体
 var Failed = 500
 
-func AckMessageOk(data interface{}) *AckMessage {
+func AckMessageOk(msg string, data interface{}) *AckMessage {
+
 	return &AckMessage{
 		Ok,
-		"成功",
+		msg,
 		data,
 	}
 }
 
-func AckMessageInvalid(data interface{}) *AckMessage {
+func AckMessageInvalid(msg string, data interface{}) *AckMessage {
 	return &AckMessage{
 		Invalid,
-		"非法请求",
+		msg,
 		data,
 	}
 }
 
-func AckMessageFailed(data interface{}) *AckMessage {
+func AckMessageFailed(msg string, data interface{}) *AckMessage {
 	return &AckMessage{
 		Failed,
-		"操作失败",
+		msg,
 		data,
 	}
 }

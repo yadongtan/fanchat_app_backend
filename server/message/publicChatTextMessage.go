@@ -28,7 +28,7 @@ func (this *PublicChatTextMessage) Invoke() Message {
 	_ = DurationTextToRedis(this)
 	// 转发给其他人
 	MsgChan <- this
-	return AckMessageOk(nil)
+	return AckMessageOk("Ok", nil)
 }
 
 // 持久化此消息到Redis

@@ -2,7 +2,6 @@ package main
 
 import (
 	"container/list"
-	"fantastic_chat/server/database"
 	"fantastic_chat/server/handler"
 	"fmt"
 	"net"
@@ -26,8 +25,6 @@ func main() {
 func startServer(ip string, port int) {
 	connList := list.New()
 	address := fmt.Sprintf("%s:%d", ip, port)
-	//打开到数据库的连接
-	database.OpenDefault()
 	// 监听端口
 	listener, err := net.Listen("tcp", address)
 	if err != nil {

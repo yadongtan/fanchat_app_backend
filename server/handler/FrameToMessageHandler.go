@@ -4,6 +4,7 @@ import (
 	"fantastic_chat/server/frame"
 	"fantastic_chat/server/message"
 	"fmt"
+	"strings"
 )
 
 type FrameToMessageHandler struct {
@@ -17,21 +18,22 @@ func (this *FrameToMessageHandler) read(ctx *Context, obj interface{}) (interfac
 
 	f := obj.(*frame.Frame)
 	msg := f.Payload.(message.Message)
-
-	ackMsg := msg.Invoke()
-
+	var ackMsg message.Message
 	//判断登录消息
 	if f.FrameType == message.SignInFrameType {
+		msg.(*message.SignInMessage).Ip = strings.Split(ctx.Conn.RemoteAddr().String(), ":")[0]
+		ackMsg = msg.Invoke()
 		//登录成功
 		if ackMsg.(*message.AckMessage).Ack == message.Ok {
 			fmt.Printf("用户[%s] 登录成功\n", msg.(*message.SignInMessage).Username)
 			ctx.Ch.TTid = msg.(*message.SignInMessage).TTid
+			ctx.Ch.Username = ackMsg.(*message.AckMessage).Data.(string)
 			OnlineUserChannelChan <- ctx.Ch
 		} else {
 			fmt.Printf("用户[%s] 登录失败\n", msg.(*message.SignInMessage).Username)
 		}
-	}
 
+	}
 	fmt.Printf("AckMsg:%v\n", ackMsg)
 	ackF := frame.GenerateAckFrame(f, ackMsg)
 	fmt.Printf("AckFrame:%v\n", ackF)

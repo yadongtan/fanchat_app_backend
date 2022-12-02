@@ -9,6 +9,6 @@ type GetOnlinePersonCountMessage struct {
 
 func (this *GetOnlinePersonCountMessage) Invoke() Message {
 	count := channel.Cs.OnlinePersonCount
-	ackMsg := AckMessageOk(count)
+	ackMsg := AckMessageOk("Ok", count)
 	return ackMsg
 }
