@@ -17,6 +17,8 @@ var PublicChatImgMessageFrameType = 201
 var PublicChatTextMessageFrameType = 202
 var PublicChatVideoMessageType = 203
 
+var SignUpMessageFrameType = 301
+
 func GetMessageByType(messageType int) interface{} {
 	switch messageType {
 	case SignInFrameType:
@@ -36,6 +38,11 @@ func GetMessageByType(messageType int) interface{} {
 		return &PublicChatTextMessage{}
 	case PublicChatVideoMessageType:
 		return &PublicChatVideoMessage{}
+	}
+
+	switch messageType {
+	case SignUpMessageFrameType:
+		return &SignUpMessage{}
 	}
 
 	return nil
@@ -61,6 +68,12 @@ func GetMessageTypeByInterface(msg interface{}) int {
 		return PublicChatTextMessageFrameType
 	case *PublicChatVideoMessage:
 		return PublicChatVideoMessageType
+	}
+
+	switch msg.(type) {
+	case *SignUpMessage:
+		return SignUpMessageFrameType
+
 	}
 	return 0
 }

@@ -9,13 +9,14 @@ import (
 )
 
 type UserAccount struct {
-	TTid     int `gorm:"Column:ttid"`
+	TTid     int `gorm:"Column:ttid;PRIMARY_KEY;AUTO_INCREMENT;Column:ttid"`
 	Username string
 	Password string
+	Ctime    string `gorm:"Column:ctime"`
 }
 
 type UserSigninLog struct {
-	LogId       int    `gorm:"PRIMARY_KEY;AUTO_INCREAMENT;Column:log_id"`
+	LogId       int    `gorm:"PRIMARY_KEY;AUTO_INCREMENT;Column:log_id"`
 	TTid        int    `gorm:"Column:ttid"`
 	Type        string //online/offline
 	Ctime       string `gorm:"Column:ctime"` //2002-01-01 01:01:01
@@ -41,6 +42,7 @@ func GetIpDetails(ip string) *IpDetails {
 	ipDetails := &IpDetails{}
 	resp, err := http.Get("https://whois.pconline.com.cn/ipJson.jsp?ip=" + ip + "&json=true")
 	if err != nil {
+		return ipDetails
 	}
 	defer resp.Body.Close()
 	if resp != nil {
