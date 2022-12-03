@@ -18,7 +18,7 @@ type UserSigninLog struct {
 	LogId       int    `gorm:"PRIMARY_KEY;AUTO_INCREAMENT;Column:log_id"`
 	TTid        int    `gorm:"Column:ttid"`
 	Type        string //online/offline
-	Ctime       string `gorm:"Column:ctime"` //YY/MM/DD HH:mm:ss
+	Ctime       string `gorm:"Column:ctime"` //2002-01-01 01:01:01
 	Ip          string
 	Province    string
 	City        string

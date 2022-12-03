@@ -1,4 +1,4 @@
-package redis
+package myredis
 
 import (
 	"fmt"
@@ -23,6 +23,7 @@ func Setup() error {
 		MaxActive: 30,
 		//在给定时间内，保持空闲状态的时间，若到达时间限制则关闭连接（当为零时，没有限制）
 		IdleTimeout: 200,
+		Wait:        true,
 		//提供创建和配置应用程序连接的一个函数
 		Dial: func() (redis.Conn, error) {
 			c, err := redis.Dial("tcp", "yadong.icu:6379")

@@ -69,7 +69,7 @@ func init() {
 			channel.Cs.OnlinePersonCount = len(OnlineUserChannelMap)
 			fmt.Printf("用户[TTid=%d]已上线\n", c.TTid)
 			fmt.Printf("当前在线用户:%v\n", OnlineUserChannelMap)
-
+			go c.SendPreviousMsgPublicChat()
 		}
 	}()
 	// 移除在线用户
@@ -85,7 +85,7 @@ func init() {
 			signinLog := &database.UserSigninLog{
 				TTid:     c.TTid,
 				Type:     "Offline",
-				Ctime:    time.Now().Format("2002-01-01 01:01:01"),
+				Ctime:    time.Now().Format("2006-01-02 15:04:05"),
 				Ip:       ip,
 				Province: ipDetails.Province,
 				City:     ipDetails.City,
@@ -165,4 +165,29 @@ func (this *Channel) KeepAlive() {
 
 func (this *Channel) AddHandler(h Handler) {
 	this.Ctx.Chain.AddHandler(h)
+}
+
+//查询用户最后一次上线的时间, 并将消息发给该用户
+func (this *Channel) SendPreviousMsgPublicChat() {
+	// 先查询用户最后一次上线时间
+	log := &database.UserSigninLog{}
+	err := database.GetDB().Where("ttid = ? and `type` = 'offline'", this.TTid).Order("ctime").First(log)
+	var t float32
+	if log.Ctime != "" && err == nil {
+		// 部分消息
+		timeStruct, err := time.Parse("2006-01-02 15:04:05", log.Ctime)
+		if err != nil {
+			fmt.Println("SendPreviousMsgPublicChat() 解析时间错误! err: ", err)
+		}
+		unixTInt64 := timeStruct.Unix()
+		tFloat64, _ := strconv.ParseFloat(strconv.FormatInt(unixTInt64, 10), 32)
+		t = float32(tFloat64)
+	}
+	PublicChatTextMessageArray := message.GetTextFromRedis(t)
+	for _, msg := range PublicChatTextMessageArray {
+		if this.TTid == msg.TTid {
+			continue
+		}
+		this.Write(msg)
+	}
 }

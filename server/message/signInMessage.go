@@ -29,7 +29,7 @@ func (this *SignInMessage) Invoke() Message {
 		signinLog := &database.UserSigninLog{
 			TTid:        this.TTid,
 			Type:        "Online",
-			Ctime:       time.Now().Format("2002-01-01 01:01:01"),
+			Ctime:       time.Now().Format("2006-01-02 15:04:05"),
 			Ip:          this.Ip,
 			Province:    ipDetails.Province,
 			City:        ipDetails.City,

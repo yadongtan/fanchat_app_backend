@@ -7,22 +7,17 @@ import (
 )
 
 // frameId
-var WaitForAckMessageChanMap map[string]chan *frame.Frame
-
-func init() {
-	WaitForAckMessageChanMap = make(map[string]chan *frame.Frame)
-}
 
 type ByteToFrameHandler struct {
+	WaitForAckMessageChanMap map[string]chan *frame.Frame
 }
 
 func (this *ByteToFrameHandler) read(ctx *Context, obj interface{}) (interface{}, error) {
 	rawData := obj.([]byte)
-	fmt.Printf("[ByteToFrameHandler] read: %v\n", rawData)
 	f := frame.ResolveFrame(rawData)
-
+	fmt.Printf("接收到Frame: %v\n", f)
 	//尝试获取chan, 以便回复消息
-	ackMessageChan := WaitForAckMessageChanMap[f.FrameId]
+	ackMessageChan := this.WaitForAckMessageChanMap[f.FrameId]
 	if ackMessageChan != nil {
 		ackMessageChan <- f //响应消息, 交给下面的write函数
 		return nil, nil
@@ -50,12 +45,12 @@ func (this *ByteToFrameHandler) write(ctx *Context, obj interface{}) interface{}
 	waitChan := make(chan *frame.Frame)
 	defer close(waitChan)
 
-	WaitForAckMessageChanMap[frameId] = waitChan
+	this.WaitForAckMessageChanMap[frameId] = waitChan
 
 	ackF := <-waitChan //拿到这个响应的frame
 
 	//删除接收响应的chan
-	delete(WaitForAckMessageChanMap, frameId)
+	delete(this.WaitForAckMessageChanMap, frameId)
 
 	fmt.Printf("接收响应frame:%v\n", ackF)
 
