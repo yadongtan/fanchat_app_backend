@@ -9,10 +9,10 @@ import (
 )
 
 type UserAccount struct {
-	TTid     int `gorm:"Column:ttid;PRIMARY_KEY;AUTO_INCREMENT;Column:ttid"`
-	Username string
-	Password string
-	Ctime    string `gorm:"Column:ctime"`
+	TTid     int    `json:"ttid" gorm:"Column:ttid;PRIMARY_KEY;AUTO_INCREMENT;"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Ctime    string `json:"ctime" gorm:"Column:ctime"`
 }
 
 type UserSigninLog struct {

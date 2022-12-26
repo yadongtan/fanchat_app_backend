@@ -2,23 +2,30 @@ package main
 
 import (
 	"container/list"
+	"fantastic_chat/server/channel"
 	"fantastic_chat/server/frame"
 	"fantastic_chat/server/handler"
 	"fmt"
+	"log"
 	"net"
+	"net/http"
+	_ "net/http/pprof"
 	"sync"
 )
 
 type fantasticChatServer struct {
-	OnlineUserMap map[int]net.Conn //用户id与conn
 }
 
-var singleton fantasticChatServer
 var mutexOnlineUserMap sync.Mutex
 
 func main() {
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
+
 	ip := ""
 	port := 8081
+
 	startServer(ip, port)
 
 }
@@ -32,6 +39,7 @@ func startServer(ip string, port int) {
 		fmt.Println("net.Listen err: ", err)
 		return
 	}
+
 	//接收客户端请求
 	for {
 		conn, err := listener.Accept()
@@ -61,7 +69,7 @@ func startServer(ip string, port int) {
 //添加在线用户
 func (this *fantasticChatServer) addOnlineUser(uid int, conn net.Conn) {
 	mutexOnlineUserMap.Lock()
-	this.OnlineUserMap[uid] = conn
+	channel.Cs.OnlineUserMap[uid] = conn
 	mutexOnlineUserMap.Unlock()
 }
 

@@ -8,16 +8,21 @@ type Message interface {
 	Invoke() Message
 }
 
-var AckFrameType = 100
-var SignInFrameType = 101
-var LogoutFrameType = 102
+var AckFrameType = 100    //应答
+var SignInFrameType = 101 //登录
+var LogoutFrameType = 102 //注销
 
-var GetOnlinePersonCountMessageFrameType = 200
-var PublicChatImgMessageFrameType = 201
-var PublicChatTextMessageFrameType = 202
-var PublicChatVideoMessageType = 203
+var GetOnlinePersonCountMessageFrameType = 200 //获取在线人数
+var PublicChatImgMessageFrameType = 201        //公共频道图片
+var PublicChatTextMessageFrameType = 202       //公平频道文字
+var PublicChatVideoMessageType = 203           //公共频道视频
 
-var SignUpMessageFrameType = 301
+var SignUpMessageFrameType = 301 //注册
+
+var UpdateUserAccountMessageFrameType = 401 //更新用户信息
+var AddFriendMessageFrameType = 402         //添加朋友
+var GetFriendsListMessageFrameType = 403    //查询好友列表
+var DirectFriendsMessageFrameType = 404     //私聊消息
 
 func GetMessageByType(messageType int) interface{} {
 	switch messageType {
@@ -45,6 +50,16 @@ func GetMessageByType(messageType int) interface{} {
 		return &SignUpMessage{}
 	}
 
+	switch messageType {
+	case UpdateUserAccountMessageFrameType:
+		return &UpdateUserAccountMessage{}
+	case AddFriendMessageFrameType:
+		return &AddFriendMessage{}
+	case GetFriendsListMessageFrameType:
+		return &GetFriendsListMessage{}
+	case DirectFriendsMessageFrameType:
+		return &FriendDirectMessage{}
+	}
 	return nil
 }
 
@@ -74,6 +89,17 @@ func GetMessageTypeByInterface(msg interface{}) int {
 	case *SignUpMessage:
 		return SignUpMessageFrameType
 
+	}
+
+	switch msg.(type) {
+	case *UpdateUserAccountMessage:
+		return UpdateUserAccountMessageFrameType
+	case *AddFriendMessage:
+		return AddFriendMessageFrameType
+	case *GetFriendsListMessage:
+		return GetFriendsListMessageFrameType
+	case *FriendDirectMessage:
+		return DirectFriendsMessageFrameType
 	}
 	return 0
 }

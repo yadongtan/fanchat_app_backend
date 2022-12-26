@@ -60,7 +60,6 @@ func GetTextFromRedis(fromTime float32) []*PublicChatTextMessage {
 		pctmMap[index] = pctm
 
 	}
-
 	fmt.Printf("reply : %v\n", reply)
 	return pctmMap
 }
