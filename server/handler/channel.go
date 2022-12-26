@@ -70,6 +70,7 @@ func init() {
 			fmt.Printf("用户[TTid=%d]已上线\n", c.TTid)
 			fmt.Printf("当前在线用户:%v\n", OnlineUserChannelMap)
 			go c.SendPreviousMsgPublicChat()
+			go c.SendPreviousMsgDirectChat()
 		}
 	}()
 	// 移除在线用户
@@ -189,5 +190,18 @@ func (this *Channel) SendPreviousMsgPublicChat() {
 			continue
 		}
 		this.Write(msg)
+	}
+}
+
+// 查询用户所有历史私聊消息, 并将消息发给该用户
+func (this *Channel) SendPreviousMsgDirectChat() {
+	// 先查询用户最后一次上线时间 []FriendDirectMessage, error
+	msgs, err := message.GetDirectMsg(0, this.TTid)
+	if err != nil {
+		return
+	}
+	// 发送
+	for _, msg := range msgs {
+		this.Write(&msg)
 	}
 }

@@ -23,7 +23,7 @@ func (this *FriendDirectMessage) Invoke() Message {
 }
 
 // 获取指定时间之后的私发消息
-func getDirectMsg(fromTime float32, ttid int) ([]FriendDirectMessage, error) {
+func GetDirectMsg(fromTime float32, ttid int) ([]FriendDirectMessage, error) {
 	var list []FriendDirectMessage
 	db := database.GetDB().Table("direct_msg").Where("time > ? and (from_ttid = ? or dest_ttid = ? )", fromTime, ttid, ttid).Find(&list)
 	if db.Error != nil {
