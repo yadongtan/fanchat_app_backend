@@ -11,7 +11,12 @@ type AddFriendMessage struct {
 func (this *AddFriendMessage) Invoke() Message {
 	// 向数据库中添加这条记录
 	db := database.GetDB().Table("user_friend").Create(this)
-	if db.Error != nil {
+	fri := &AddFriendMessage{
+		this.FriendTTid,
+		this.TTid,
+	}
+	db2 := database.GetDB().Table("user_friend").Create(fri)
+	if db.Error != nil || db2.Error != nil {
 		return AckMessageFailed("添加好友失败", nil)
 	}
 	return AckMessageOk("添加好友成功", nil)

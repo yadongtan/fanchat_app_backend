@@ -2,6 +2,7 @@ package message
 
 import (
 	"fantastic_chat/server/database"
+	"fmt"
 )
 
 //添加朋友的消息
@@ -25,7 +26,17 @@ func (this *FriendDirectMessage) Invoke() Message {
 // 获取指定时间之后的私发消息
 func GetDirectMsg(fromTime float32, ttid int) ([]FriendDirectMessage, error) {
 	var list []FriendDirectMessage
+
 	db := database.GetDB().Table("direct_msg").Where("time > ? and (from_ttid = ? or dest_ttid = ? )", fromTime, ttid, ttid).Find(&list)
+
+	if len(list) == 0 {
+		fmt.Printf("查询离线期间好友消息为空\n")
+	} else {
+		for _, msg := range list {
+			fmt.Printf("查询离线期间好友消息: %v\n", msg)
+		}
+	}
+
 	if db.Error != nil {
 		return nil, db.Error
 	}
