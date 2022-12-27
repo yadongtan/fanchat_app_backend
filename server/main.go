@@ -3,8 +3,7 @@ package main
 import (
 	"container/list"
 	"fantastic_chat/server/channel"
-	"fantastic_chat/server/frame"
-	"fantastic_chat/server/handler"
+	"fantastic_chat/server/message"
 	"fmt"
 	"log"
 	"net"
@@ -48,12 +47,12 @@ func startServer(ip string, port int) {
 			continue
 		}
 
-		ch := handler.CreateChannel(conn)
-		ch.AddHandler(&handler.LengthFieldBasedFrameDecoder{})
-		ch.AddHandler(&handler.ByteToFrameHandler{
-			make(map[string]chan *frame.Frame),
+		ch := message.CreateChannel(conn)
+		ch.AddHandler(&message.LengthFieldBasedFrameDecoder{})
+		ch.AddHandler(&message.ByteToFrameHandler{
+			make(map[string]chan *message.Frame),
 		})
-		ch.AddHandler(&handler.FrameToMessageHandler{})
+		ch.AddHandler(&message.FrameToMessageHandler{})
 
 		go ch.KeepAlive() // 持续读取并处理数据
 

@@ -16,6 +16,12 @@ type FriendDirectMessage struct {
 func (this *FriendDirectMessage) Invoke() Message {
 	// 向数据库中添加这条记录
 	db := database.GetDB().Table("direct_msg").Create(this)
+	// 查看好友是否在线, 如果在, 转发该消息给该好友
+
+	c := OnlineUserChannelMap[this.DestTTid]
+	if c != nil {
+		go c.Write(this)
+	}
 
 	if db.Error != nil {
 		return AckMessageFailed("发送消息失败", nil)

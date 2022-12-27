@@ -12,6 +12,7 @@ type UserAccount struct {
 	TTid     int    `json:"ttid" gorm:"Column:ttid;PRIMARY_KEY;AUTO_INCREMENT;"`
 	Username string `json:"username"`
 	Password string `json:"password"`
+	Phone    string `json:"phone" gorm:"Column:phone"`
 	Ctime    string `json:"ctime" gorm:"Column:ctime"`
 }
 

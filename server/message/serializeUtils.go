@@ -1,8 +1,7 @@
-package serialize
+package message
 
 import (
 	"encoding/json"
-	"fantastic_chat/server/message"
 	"fmt"
 )
 
@@ -23,7 +22,7 @@ func UnserializeByType(serializeType int, payload []byte, messageType int) inter
 	fmt.Printf("反序列化前:%v \n", string(payload))
 	switch serializeType {
 	case JsonSerializeType:
-		msg := message.GetMessageByType(messageType)
+		msg := GetMessageByType(messageType)
 		err := json.Unmarshal(payload, msg)
 		if err != nil {
 			fmt.Printf("反序列化失败 ! err : %v\n", err)

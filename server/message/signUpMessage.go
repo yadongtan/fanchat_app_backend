@@ -9,6 +9,7 @@ import (
 type SignUpMessage struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+	Phone    string `json:"phone"`
 }
 
 func (this *SignUpMessage) Invoke() Message {
@@ -17,6 +18,7 @@ func (this *SignUpMessage) Invoke() Message {
 
 	userAccount.Username = this.Username
 	userAccount.Password = this.Password
+	userAccount.Phone = this.Phone
 	userAccount.Ctime = time.Now().Format("2006-01-02 15:04:05")
 
 	// 创建账号S

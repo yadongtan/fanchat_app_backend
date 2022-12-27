@@ -1,9 +1,7 @@
-package frame
+package message
 
 import (
 	"fantastic_chat/server/encrypt"
-	"fantastic_chat/server/message"
-	"fantastic_chat/server/serialize"
 	"fantastic_chat/server/utils"
 	"fmt"
 )
@@ -29,7 +27,7 @@ func GenerateFrameByesWithFrame(frame *Frame) []byte {
 
 //生成帧并加密转换为bytes, 一些参数用默认值
 func GenerateFrameBytesDefault(frameId string, payload interface{}) []byte {
-	return GenerateFrameBytes(frameId, message.GetMessageTypeByInterface(payload), payload, encrypt.AESEncryptType, serialize.JsonSerializeType)
+	return GenerateFrameBytes(frameId, GetMessageTypeByInterface(payload), payload, encrypt.AESEncryptType, JsonSerializeType)
 }
 
 func CastFrameToByte(frameLen int, version int, frameType int, serializeType int, encryptType int, frameId string, payload interface{}) []byte {
@@ -49,7 +47,7 @@ func CastFrameToByte(frameLen int, version int, frameType int, serializeType int
 //生成帧并加密并转换为bytes
 func GenerateFrameBytes(frameId string, frameType int, payload interface{}, encryptType int, serializeType int) []byte {
 	//序列化
-	serializedPayload := serialize.Serialize(serializeType, payload)
+	serializedPayload := Serialize(serializeType, payload)
 	// 加密
 	encryptPayload := encrypt.Encrypt(serializedPayload, encryptType)
 	payloadBytes := []byte(encryptPayload)
@@ -63,18 +61,18 @@ func GenerateFrameBytes(frameId string, frameType int, payload interface{}, encr
 }
 
 func GenerateMessageFrame(frameId string, msg interface{}) *Frame {
-	f := GenerateFrame(frameId, message.GetMessageTypeByInterface(msg), msg, encrypt.AESEncryptType, serialize.JsonSerializeType)
+	f := GenerateFrame(frameId, GetMessageTypeByInterface(msg), msg, encrypt.AESEncryptType, JsonSerializeType)
 	return f
 }
 
 func GenerateAckFrame(from *Frame, ackMessage interface{}) *Frame {
-	return GenerateFrame(from.FrameId, message.AckFrameType, ackMessage, from.EncryptType, from.SerializeType)
+	return GenerateFrame(from.FrameId, AckFrameType, ackMessage, from.EncryptType, from.SerializeType)
 }
 
 //生成帧并加密
 func GenerateFrame(frameId string, frameType int, payload interface{}, encryptType int, serializeType int) *Frame {
 	//序列化
-	serializedPayload := serialize.Serialize(serializeType, payload)
+	serializedPayload := Serialize(serializeType, payload)
 	// 加密
 	encryptPayload := encrypt.Encrypt(serializedPayload, encryptType)
 	payloadBytes := []byte(encryptPayload)
@@ -108,7 +106,7 @@ func ResolveFrame(bytes []byte) *Frame {
 	//解密
 	de := encrypt.Decrypt(string(payload), encryptType)
 	// 反序列化
-	msg := serialize.UnserializeByType(serializeType, []byte(de), frameType)
+	msg := UnserializeByType(serializeType, []byte(de), frameType)
 
 	frame := Frame{
 		frameLen, version, frameType, serializeType, encryptType, frameId, msg,

@@ -1,9 +1,8 @@
-package handler
+package message
 
 import (
 	"fantastic_chat/server/channel"
 	"fantastic_chat/server/database"
-	"fantastic_chat/server/message"
 	"fmt"
 	"net"
 	"strconv"
@@ -101,7 +100,7 @@ func init() {
 	// 写出所有公有消息
 	go func() {
 		for {
-			publicTextMsg := <-message.MsgChan
+			publicTextMsg := <-MsgChan
 			for ttid, ch := range OnlineUserChannelMap {
 				if ttid == publicTextMsg.TTid {
 					continue
@@ -184,7 +183,7 @@ func (this *Channel) SendPreviousMsgPublicChat() {
 		tFloat64, _ := strconv.ParseFloat(strconv.FormatInt(unixTInt64, 10), 32)
 		t = float32(tFloat64)
 	}
-	PublicChatTextMessageArray := message.GetTextFromRedis(t)
+	PublicChatTextMessageArray := GetTextFromRedis(t)
 	for _, msg := range PublicChatTextMessageArray {
 		if this.TTid == msg.TTid {
 			continue
@@ -196,7 +195,7 @@ func (this *Channel) SendPreviousMsgPublicChat() {
 // 查询用户所有历史私聊消息, 并将消息发给该用户
 func (this *Channel) SendPreviousMsgDirectChat() {
 	// 先查询用户最后一次上线时间 []FriendDirectMessage, error
-	msgs, err := message.GetDirectMsg(0, this.TTid)
+	msgs, err := GetDirectMsg(0, this.TTid)
 	if err != nil {
 		return
 	}

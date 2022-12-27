@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fantastic_chat/server/frame"
 	"fantastic_chat/server/message"
 	"fmt"
 	"net"
@@ -42,7 +41,7 @@ func readData(conn net.Conn) {
 			continue
 		}
 		str := string(data[0:cnt])
-		f := frame.ResolveFrame([]byte(str))
+		f := message.ResolveFrame([]byte(str))
 		//读取到数据
 		fmt.Printf("接收到服务器响应: %v\n", f)
 	}
@@ -62,7 +61,7 @@ func writeData(conn net.Conn) {
 			"yadong",
 			"yadong123456",
 		}
-		bytes := frame.GenerateFrameBytesDefault(1, msg)
+		bytes := message.GenerateFrameBytesDefault(1, msg)
 
 		fmt.Println(string(bytes))
 		// _, err = conn.Write([]byte(message))
