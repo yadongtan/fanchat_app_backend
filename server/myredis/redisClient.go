@@ -26,7 +26,7 @@ func Setup() error {
 		Wait:        true,
 		//提供创建和配置应用程序连接的一个函数
 		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", "yadong.icu:6379")
+			c, err := redis.Dial("tcp", "120.26.76.100:6379")
 			if err != nil {
 				return nil, err
 			}

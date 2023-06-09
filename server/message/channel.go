@@ -21,14 +21,14 @@ type Channel struct {
 }
 
 // 原子操作版加函数
-func (this *Channel) atomicIncrNum(i uint32) int {
+func (this *Channel) atomicIncrNum(i *uint32) int {
 	this.wg.Add(1)
 	defer this.wg.Done()
-	return int(atomic.AddUint32(&i, 1))
+	return int(atomic.AddUint32(i, 1))
 }
 
 func (this *Channel) GenerateFrameId() string {
-	incIdNum := this.atomicIncrNum(this.frameIdIncrement) //获取一个唯一的自增数字
+	incIdNum := this.atomicIncrNum(&this.frameIdIncrement) //获取一个唯一的自增数字
 	frameId := IntToString(this.TTid, 9) + IntToString(incIdNum, 10)
 	return frameId
 }
@@ -48,7 +48,7 @@ func IntToString(i int, numLength int) string {
 }
 
 // 在线用户集合
-var OnlineUserChannelMap map[int]*Channel
+var OnlineUserChannelMap sync.Map
 
 // 要添加到在线用户集合的管道
 var OnlineUserChannelChan chan *Channel
@@ -59,13 +59,13 @@ var OfflineUserChannelChan chan *Channel
 func init() {
 	OnlineUserChannelChan = make(chan *Channel, 10)
 	OfflineUserChannelChan = make(chan *Channel, 10)
-	OnlineUserChannelMap = make(map[int]*Channel)
+	// OnlineUserChannelMap = make(map[int]*Channel)
 	// 添加在线用户
 	go func() {
 		for {
 			c := <-OnlineUserChannelChan
-			OnlineUserChannelMap[c.TTid] = c
-			channel.Cs.OnlinePersonCount = len(OnlineUserChannelMap)
+			OnlineUserChannelMap.Store(c.TTid, c)
+			channel.IncrOnlinePersonCount()
 			fmt.Printf("用户[TTid=%d]已上线\n", c.TTid)
 			fmt.Printf("当前在线用户:%v\n", OnlineUserChannelMap)
 			go c.SendPreviousMsgPublicChat()
@@ -76,7 +76,7 @@ func init() {
 	go func() {
 		for {
 			c := <-OfflineUserChannelChan
-			delete(OnlineUserChannelMap, c.TTid)
+			OnlineUserChannelMap.Delete(c.TTid)
 
 			// 添加离线日志
 			ip := strings.Split(c.Ctx.Conn.RemoteAddr().String(), ":")[0]
@@ -101,13 +101,13 @@ func init() {
 	go func() {
 		for {
 			publicTextMsg := <-MsgChan
-			for ttid, ch := range OnlineUserChannelMap {
-				if ttid == publicTextMsg.TTid {
-					continue
+			OnlineUserChannelMap.Range(func(k, v interface{}) bool {
+				if k == publicTextMsg.TTid {
+					return true
 				}
-
-				go ch.Write(publicTextMsg)
-			}
+				go v.(*Channel).Write(publicTextMsg)
+				return true
+			})
 		}
 	}()
 }

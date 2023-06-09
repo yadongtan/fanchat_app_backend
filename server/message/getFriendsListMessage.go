@@ -23,8 +23,8 @@ func (this *GetFriendsListMessage) Invoke() Message {
 	}
 
 	for i := 0; i < len(list); i++ {
-
-		if OnlineUserChannelMap[list[i].FriendTTid] != nil {
+		_, ok := OnlineUserChannelMap.Load(list[i].FriendTTid)
+		if ok {
 			list[i].Status = database.OnlineStatus
 		} else {
 			list[i].Status = database.OfflineStatus

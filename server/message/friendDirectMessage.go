@@ -18,9 +18,9 @@ func (this *FriendDirectMessage) Invoke() Message {
 	db := database.GetDB().Table("direct_msg").Create(this)
 	// 查看好友是否在线, 如果在, 转发该消息给该好友
 
-	c := OnlineUserChannelMap[this.DestTTid]
-	if c != nil {
-		go c.Write(this)
+	c, ok := OnlineUserChannelMap.Load(this.DestTTid)
+	if ok {
+		go c.(*Channel).Write(this)
 	}
 
 	if db.Error != nil {
