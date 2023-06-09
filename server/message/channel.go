@@ -17,13 +17,9 @@ type Channel struct {
 	TTid             int      // 用户id
 	Username         string   // 用户名称
 	frameIdIncrement uint32
-	wg               sync.WaitGroup
 }
 
-// 原子操作版加函数
 func (this *Channel) atomicIncrNum(i *uint32) int {
-	this.wg.Add(1)
-	defer this.wg.Done()
 	return int(atomic.AddUint32(i, 1))
 }
 
@@ -77,7 +73,7 @@ func init() {
 		for {
 			c := <-OfflineUserChannelChan
 			OnlineUserChannelMap.Delete(c.TTid)
-
+			channel.DecrOnlinePersonCount()
 			// 添加离线日志
 			ip := strings.Split(c.Ctx.Conn.RemoteAddr().String(), ":")[0]
 			ipDetails := database.GetIpDetails(ip)
@@ -121,7 +117,6 @@ func CreateChannel(conn net.Conn) *Channel {
 			nil,
 		},
 		TTid: -1,
-		wg:   sync.WaitGroup{},
 	}
 	ch.Ctx.Ch = ch
 	return ch

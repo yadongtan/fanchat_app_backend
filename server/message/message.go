@@ -24,6 +24,8 @@ var AddFriendMessageFrameType = 402         //添加朋友
 var GetFriendsListMessageFrameType = 403    //查询好友列表
 var DirectFriendsMessageFrameType = 404     //私聊消息
 
+var CreateChatMessageFrameType = 501 //创建OpenAI的Chat(Text)聊天机器人
+
 func GetMessageByType(messageType int) interface{} {
 	switch messageType {
 	case SignInFrameType:
@@ -59,6 +61,11 @@ func GetMessageByType(messageType int) interface{} {
 		return &GetFriendsListMessage{}
 	case DirectFriendsMessageFrameType:
 		return &FriendDirectMessage{}
+	}
+
+	switch messageType {
+	case CreateChatMessageFrameType:
+		return &CreateChatMessage{}
 	}
 	return nil
 }
@@ -100,6 +107,11 @@ func GetMessageTypeByInterface(msg interface{}) int {
 		return GetFriendsListMessageFrameType
 	case *FriendDirectMessage:
 		return DirectFriendsMessageFrameType
+	}
+
+	switch msg.(type) {
+	case *CreateChatMessage:
+		return CreateChatMessageFrameType
 	}
 	return 0
 }
