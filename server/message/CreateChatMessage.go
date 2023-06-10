@@ -1,7 +1,7 @@
 package message
 
 import (
-	"fantastic_chat/server/entity"
+	"fantastic_chat/server/database"
 )
 
 //开启一个与OpenAIChat模型的聊天
@@ -13,7 +13,7 @@ type CreateChatMessage struct {
 
 func (this *CreateChatMessage) Invoke() Message {
 	// 为用户生成一个AI的账号, 虚拟出来
-	err := entity.CreateOpenAIChatAccount(this.TTid, "text", this.Model)
+	err := database.CreateOpenAIChatAccount(this.TTid, "text", this.Model)
 	if err != nil {
 		return AckMessageFailed("生成AI账号失败!", err.Error())
 	}

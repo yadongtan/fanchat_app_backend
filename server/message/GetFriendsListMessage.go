@@ -11,7 +11,6 @@ type GetFriendsListMessage struct {
 }
 
 func (this *GetFriendsListMessage) Invoke() Message {
-	// 向数据库中添加这条记录
 	var list []database.UserFriendDetails
 	r := database.GetDB().Table("user_friend as t1").Select("t1.ttid as ttid ,t1.friend_ttid as friend_ttid  , t2.username as friend_username").
 		Joins("inner join user_accounts as t2 on t1.friend_ttid = t2.ttid").
