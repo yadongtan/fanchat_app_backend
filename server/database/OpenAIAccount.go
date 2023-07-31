@@ -15,6 +15,15 @@ type OpenAIAccount struct {
 	Ctime   string `json:"ctime" gorm:"Column:ctime"`
 }
 
+const (
+	TextType  string = "text"
+	ImageType string = "image"
+)
+
+const (
+	GPT_3_5_Turbo string = "gpt-3.5-turbo"
+)
+
 func CreateOpenAIChatAccount(ttid int, aiType string, model string) error {
 
 	aiAccount := OpenAIAccount{}
