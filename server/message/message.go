@@ -27,6 +27,9 @@ var DirectFriendsMessageFrameType = 404     //私聊消息
 var CreateChatMessageFrameType = 501 //创建OpenAI的Chat(Text)聊天机器人
 var GetAIFriendsListFrameType = 502
 
+var CreateRoomMessageFrameType = 601 //创建房间
+var GetRoomListFrameType = 602       //获取房间列表
+
 func GetMessageByType(messageType int) interface{} {
 	switch messageType {
 	case SignInFrameType:
@@ -69,6 +72,13 @@ func GetMessageByType(messageType int) interface{} {
 		return &CreateChatMessage{}
 	case GetAIFriendsListFrameType:
 		return &GetAIFriendsListMessage{}
+	}
+
+	switch messageType {
+	case CreateRoomMessageFrameType:
+		return &CreateRoomMessage{}
+	case GetRoomListFrameType:
+		return &GetRoomListMessage{}
 	}
 	return nil
 }
@@ -117,6 +127,13 @@ func GetMessageTypeByInterface(msg interface{}) int {
 		return CreateChatMessageFrameType
 	case *GetAIFriendsListMessage:
 		return GetAIFriendsListFrameType
+	}
+
+	switch msg.(type) {
+	case *CreateRoomMessage:
+		return CreateRoomMessageFrameType
+	case *GetRoomListMessage:
+		return GetRoomListFrameType
 	}
 	return 0
 }
